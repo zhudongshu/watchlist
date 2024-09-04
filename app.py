@@ -55,26 +55,23 @@ def forge():
     db.session.commit()
     click.echo('Done.')
 
+
 @app.route('/')
-def hello():
-    name = User.query.first()
+def index():
     movies = Movie.query.all()
-    return render_template('index.html', name=name.name, movies=movies)
+    return render_template('index.html', movies=movies)
 
 
-@app.route('/user/<name>')
-def user_page(name):
-    return f'User: {escape(name)}'
+@app.errorhandler(404)
+def page_not_found(e):
+    user = User.query.first()
+    return render_template('404.html'), 404
 
+@app.context_processor
+def inject_user():
+    user = User.query.first()
+    return dict(name=user)
 
-@app.route('/test')
-def test():
-    print(url_for('hello'))
-    print(url_for('user_page', name='Zhu, Dongshu'))
-    print(url_for('user_page', name='Black Monkey'))
-    print(url_for('test'))
-    print(url_for('test', num=2))
-    return "Test page"
 
 
 if __name__ == '__main__':

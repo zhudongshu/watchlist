@@ -1,22 +1,15 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>{{ name }}'s Watchlist</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" type="text/css">
-</head>
-<body>
-    <img src="{{ url_for('static', filename='images/avatar.png') }}" alt="Avatar" class="avatar">
-    <h2>{{ name }}'s Watchlist</h2>
-    <p>{{ movies|length }} Titles</p>
-    <ul class="movie-list">
-        {% for movie in movies %}
-            <li>{{ movie.title }} - {{ movie.year }}</li>
-        {% endfor %}
-    </ul>
-    <img src="{{ url_for('static', filename='images/totoro.gif') }}" alt="Walking Totoro" class="totoro">
-    <footer>
-        <small>&copy; 2024 <a href="http://helloflask.com/book/3">HelloFlask</a></small>
-    </footer>
-</body>
-</html>
+{% extends 'base.html' %}
+
+{% block content %}
+<p>{{ movies|length }} Titles</p>
+<ul class="movie-list">
+    {% for movie in movies %}
+    <li>{{ movie.title }} - {{ movie.year }}
+        <span class="float-right">
+            <a href="https://www.imdb.com/find?q={{ movie.title }}" class="imdb" target="_blank" title="Find this movie on IMDB">IMDB</a>
+        </span>
+    </li>
+    {% endfor %}
+</ul>
+<img src="{{ url_for('static', filename='images/totoro.gif') }}" alt="Walking Totoro" class="totoro" title="to~to~ro">
+{% endblock %}
