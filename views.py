@@ -5,63 +5,13 @@
 # Author: Zhu, Dongshu
 # File: app.py.py
 # Version: python 3.9.13
-# Description: 
+# Description:
 """
-import os
 import click
-from flask import Flask, url_for, render_template, request, flash, redirect
-from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
-from flask_sqlalchemy import SQLAlchemy
-from werkzeug.security import generate_password_hash, check_password_hash
-
-
-app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////'+os.path.join(app.root_path, 'data.db')
-app.config['SECRET_KEY'] = 'test'
-db = SQLAlchemy(app)
-
-
-class User(db.Model, UserMixin):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(20))
-    username = db.Column(db.String(20))
-    password_hash = db.Column(db.String(128))
-
-    def set_password(self, password):
-        self.password_hash = generate_password_hash(password)
-
-    def validate_password(self, password):
-        return check_password_hash(self.password_hash, password)
-
-
-class Movie(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(60))
-    year = db.Column(db.String(4))
-
-
-@app.cli.command()
-def forge():
-    db.create_all()
-    name = 'Zhu, Dongshu'
-    movies = [
-        {'title': 'My Neighbor Totoro', 'year': '1988'},
-        {'title': 'Dead Poets Society', 'year': '1989'},
-        {'title': 'A Perfect World', 'year': '1993'},
-        {'title': 'Leon', 'year': '1994'},
-        {'title': 'Mahjong', 'year': '1996'},
-        {'title': 'Swallowtail Butterfly', 'year': '1996'},
-    ]
-
-    user = User(name=name)
-    db.session.add(user)
-
-    for m in movies:
-        movie = Movie(title=m['title'], year=m['year'])
-        db.session.add(movie)
-
-    db.session.commit()
-    click.echo('Done.')
+from flask import url_for, render_template, request, flash, redirect
+from flask_login import login_user, login_required, logout_user, current_user
+from watchlist import db, app
+from watchlist.models import User, Movie
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -118,11 +68,6 @@ def page_not_found(e):
     user = User.query.first()
     return render_template('404.html'), 404
 
-@app.context_processor
-def inject_user():
-    user = User.query.first()
-    return dict(name=user)
-
 
 @app.cli.command()
 @click.option('--username', prompt=True, help='The username used to login.')
@@ -143,14 +88,6 @@ def admin(username, password):
 
     db.session.commit()
     click.echo('Done.')
-
-
-login_manager = LoginManager(app)
-login_manager.login_view = 'login'
-
-@login_manager.user_loader
-def load_user(user_id):
-    return User.query.get(int(user_id))
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -199,5 +136,6 @@ def settings():
 
     return render_template('settings.html')
 
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0', port=5050)

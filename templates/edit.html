@@ -6,5 +6,6 @@
   Name <input type="text" name="title" autocomplete="off" required value="{{ movie.title }}">
   Year <input type="text" name="year" autocomplete="off" required value="{{ movie.year }}">
   <input type="submit" value="Update" class="btn" name="submit">
+  <input type="submit" value="Back" class="btn" name="submit"><a href="{{ url_for('index') }}"></a>
 </form>
 {% endblock %}
