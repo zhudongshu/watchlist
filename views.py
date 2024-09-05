@@ -63,33 +63,6 @@ def delete(movie_id):
     return redirect(url_for('index'))
 
 
-@app.errorhandler(404)
-def page_not_found(e):
-    user = User.query.first()
-    return render_template('404.html'), 404
-
-
-@app.cli.command()
-@click.option('--username', prompt=True, help='The username used to login.')
-@click.option('--password', prompt=True, hide_input=True, confirmation_prompt=True, help='The password used to login.')
-def admin(username, password):
-    db.create_all()
-
-    user = User.query.first()
-    if user is not None:
-        click.echo('Updating user...')
-        user.username = username
-        user.set_password(password)
-    else:
-        click.echo('Creating user...')
-        user = User(username=username, name='Admin')
-        user.set_password(password)
-        db.session.add(user)
-
-    db.session.commit()
-    click.echo('Done.')
-
-
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
